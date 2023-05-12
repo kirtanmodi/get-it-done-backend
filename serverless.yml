@@ -1,0 +1,42 @@
+service: get-it-done-backend
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  layers:
+    - !Ref ExternalLibsLambdaLayer
+
+custom:
+  layerName: get-it-done-backend
+  serverless-offline:
+    ignoreJWTSignature: true
+
+package:
+  individually: true
+
+plugins:
+  - serverless-offline
+  - serverless-jetpack
+  - serverless-stack-output
+
+layers:
+  ExternalLibs:
+    path: layers
+    name: ${self:custom.layerName}-node_modules
+    compatibleRuntimes:
+      - ${self:provider.runtime}
+
+functions:
+  hello:
+    handler: handler.hello
+
+  fun:
+    handler: functions/handler.handler
+    package:
+      include:
+        - functions/handler.js
+        - libs/*
+      exclude:
+        - "**/*"

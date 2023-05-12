@@ -1,0 +1,19 @@
+{
+  "name": "get-it-done-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "node scripts/npm-postinstall.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "serverless-jetpack": "^0.11.1",
+    "serverless-offline": "^12.0.4",
+    "serverless-stack-output": "^0.2.3"
+  }
+}
