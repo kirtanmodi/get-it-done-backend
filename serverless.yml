@@ -2,17 +2,30 @@ service: get-it-done-backend
 
 frameworkVersion: "3"
 
-# from kirtanplusone serverless.yml
-
 provider:
   name: aws
-  region: "ap-south-1"
+  region: ap-south-1
   memorySize: 128
-  timeout: 10
+  timeout: 5
   endpointType: regional
   architecture: arm64
   versionFunctions: false
   runtime: nodejs16.x
+  apiGateway:
+    shouldStartNameWithService: true
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TodoTable}"
+  environment:
+    TodoTable: ${self:service}-${opt:stage, self:provider.stage}
   layers:
     - !Ref ExternalLibsLambdaLayer
 
@@ -35,6 +48,38 @@ layers:
     name: ${self:custom.layerName}-node_modules
     compatibleRuntimes:
       - ${self:provider.runtime}
+
+resources:
+  Resources:
+    TodoTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.TodoTable}
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: N
+          - AttributeName: noteId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: timestamp
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: noteId-index
+            KeySchema:
+              - AttributeName: noteId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
 
 functions:
   hello:
