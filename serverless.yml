@@ -13,6 +13,8 @@ provider:
   runtime: nodejs16.x
   apiGateway:
     shouldStartNameWithService: true
+  environment:
+    TodoTable: TodoTable
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -24,8 +26,6 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TodoTable}"
-  environment:
-    TodoTable: ${self:service}-${opt:stage, self:provider.stage}
   layers:
     - !Ref ExternalLibsLambdaLayer
 
