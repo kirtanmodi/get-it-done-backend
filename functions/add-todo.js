@@ -75,6 +75,8 @@ exports.handler = async (event) => {
 
     await dynamodb.put(params).promise();
 
+    console.log("todo added successfully", item);
+
     return {
       statusCode: 200,
       body: JSON.stringify({
