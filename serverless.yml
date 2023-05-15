@@ -18,10 +18,7 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - dynamodb:DescribeTable
         - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
@@ -30,6 +27,15 @@ provider:
     - !Ref ExternalLibsLambdaLayer
 
 custom:
+  allowedHeaders:
+    - Accept
+    - Content-Length
+    - Content-Type
+    - X-Amz-Date
+    - Authorization
+    - X-Api-Key
+    - X-Amz-Security-Token
+    - X-Amz-User-Agent
   layerName: get-it-done-backend
   serverless-offline:
     ignoreJWTSignature: true
@@ -82,14 +88,19 @@ resources:
               WriteCapacityUnits: 1
 
 functions:
-  hello:
-    handler: functions/hello.handler
+  add-todo:
+    handler: functions/add-todo.handler
     package:
       include:
-        - functions/hello.js
+        - functions/add-todo.js
       exclude:
         - "**/*"
     events:
       - http:
-          path: hello
-          method: get
+          path: todo
+          method: post
+          cors:
+            origin: "*"
+            headers: ${self:custom.allowedHeaders}
+            
+
