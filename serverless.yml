@@ -18,6 +18,8 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
+        - dynamodb:BatchGetItem
+        - dynamodb:BatchWriteItem
         - dynamodb:Query
         - dynamodb:PutItem
         - dynamodb:UpdateItem
@@ -39,6 +41,7 @@ custom:
   layerName: get-it-done-backend
   serverless-offline:
     ignoreJWTSignature: true
+    httpPort: 4000
 
 package:
   individually: true
@@ -64,28 +67,28 @@ resources:
         AttributeDefinitions:
           - AttributeName: userId
             AttributeType: S
-          - AttributeName: timestamp
-            AttributeType: N
+          # - AttributeName: timestamp
+          #   AttributeType: N
           - AttributeName: noteId
             AttributeType: S
         KeySchema:
           - AttributeName: userId
             KeyType: HASH
-          - AttributeName: timestamp
+          - AttributeName: noteId
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        GlobalSecondaryIndexes:
-          - IndexName: noteId-index
-            KeySchema:
-              - AttributeName: noteId
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+        # GlobalSecondaryIndexes:
+        #   - IndexName: noteId-index
+        #     KeySchema:
+        #       - AttributeName: noteId
+        #         KeyType: HASH
+        #     Projection:
+        #       ProjectionType: ALL
+        #     ProvisionedThroughput:
+        #       ReadCapacityUnits: 1
+        #       WriteCapacityUnits: 1
 
 functions:
   add-todo:
@@ -103,5 +106,18 @@ functions:
           cors:
             origin: "*"
             headers: ${self:custom.allowedHeaders}
-            
-
+  add-todos:
+    handler: functions/add-todos.handler
+    package:
+      include:
+        - functions/add-todos.js
+        - functions/util.js
+      exclude:
+        - "**/*"
+    events:
+      - http:
+          path: todos
+          method: post
+          cors:
+            origin: "*"
+            headers: ${self:custom.allowedHeaders}
