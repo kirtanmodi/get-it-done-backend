@@ -126,3 +126,19 @@ functions:
           cors:
             origin: "*"
             headers: ${self:custom.allowedHeaders}
+
+  update-todos:
+    handler: functions/update-todo.handler
+    package:
+      include:
+        - functions/update-todo.js
+        - functions/util.js
+      exclude:
+        - "**/*"
+    events:
+      - http:
+          path: todo
+          method: put
+          cors:
+            origin: "*"
+            headers: ${self:custom.allowedHeaders}

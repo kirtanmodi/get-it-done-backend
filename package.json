@@ -17,6 +17,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "eslint": "^8.40.0",
     "serverless": "^3.30.1",
     "serverless-jetpack": "^0.11.1",
     "serverless-offline": "^12.0.4",
